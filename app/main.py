@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from sqlalchemy.engine import make_url
 
-from app.api import health, tariffs
+from app.api import health, payments, tariffs
 from app.core.config import settings
 from app.core.db import SessionLocal, check_connection
 from app.core.seed import seed_tariffs
@@ -43,6 +43,7 @@ app = FastAPI(
 
 app.include_router(health.router)
 app.include_router(tariffs.router)
+app.include_router(payments.router)
 
 
 @app.get(
