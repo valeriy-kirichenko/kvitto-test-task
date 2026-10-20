@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Header, HTTPException, Response
+from fastapi import APIRouter, Depends, Header, HTTPException, Query, Response
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -109,6 +109,54 @@ async def create_payment(
 
     await db.refresh(payment)
     return payment
+
+
+@router.get(
+    "",
+    response_model=list[PaymentOut],
+    summary="Список платежей",
+    description=(
+        "Список платежей в порядке создания. Необязательные фильтры: "
+        "`email` (email покупателя) и `status` (статус платежа). "
+        "Без совпадений возвращается пустой список."
+    ),
+    responses={
+        200: {
+            "description": "Список платежей",
+            "content": {
+                "application/json": {
+                    "example": [
+                        {
+                            "id": 1,
+                            "status": "pending",
+                            "tariff_id": 2,
+                            "amount": 1791000,
+                            "discount": 199000,
+                            "method": "card",
+                            "installment_months": None,
+                            "schedule": None,
+                            "email": "user@example.com",
+                            "created_at": "2026-10-20T12:00:00Z",
+                        }
+                    ]
+                }
+            },
+        }
+    },
+)
+async def list_payments(
+    db: AsyncSession = Depends(get_db),
+    email: str | None = Query(default=None, description="Фильтр по email покупателя"),
+    status: str | None = Query(default=None, description="Фильтр по статусу платежа"),
+) -> list[Payment]:
+    """``GET /payments``: список платежей с необязательными фильтрами."""
+    stmt = select(Payment)
+    if email is not None:
+        stmt = stmt.where(Payment.email == email)
+    if status is not None:
+        stmt = stmt.where(Payment.status == status)
+    result = await db.execute(stmt.order_by(Payment.id))
+    return list(result.scalars().all())
 
 
 @router.get(
