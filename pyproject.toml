@@ -27,6 +27,10 @@ line-length = 100
 
 [tool.ruff.lint]
 per-file-ignores = { "tests/test_domain.py" = ["RUF007"] }
+
+[tool.ruff.lint.flake8-bugbear]
+# `Depends(...)` в значениях аргументов по умолчанию — стандартный паттерн FastAPI.
+extend-immutable-calls = ["fastapi.Depends"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
