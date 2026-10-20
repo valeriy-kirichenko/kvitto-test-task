@@ -15,8 +15,10 @@ dependencies = [
 [dependency-groups]
 dev = [
     "alembic>=1.20.0",
+    "asgi-lifespan>=2.1.0",
     "httpx>=0.28.1",
     "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
     "ruff>=0.17.1",
 ]
 
@@ -28,3 +30,8 @@ per-file-ignores = { "tests/test_domain.py" = ["RUF007"] }
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+# Асинхронные тесты и фикстуры: единый event loop сессии,
+# чтобы движок/сессии и HTTP-клиент не перескакивали между loop'ами.
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
