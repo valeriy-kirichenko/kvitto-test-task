@@ -12,6 +12,8 @@ services:
     volumes:
       - ./app:/app/app:cached
       - ./pyproject.toml:/app/pyproject.toml:ro
+      - ./alembic:/app/alembic:cached
+      - ./alembic.ini:/app/alembic.ini:ro
     depends_on:
       postgres:
         condition: service_healthy

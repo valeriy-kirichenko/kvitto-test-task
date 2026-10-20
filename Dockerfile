@@ -15,6 +15,9 @@ COPY pyproject.toml uv.lock* ./
 RUN uv sync --frozen --no-cache
 
 COPY --chown=appuser:appuser ./app ./app
+# Конфигурация и миграции Alembic — применяются в контейнере при старте API.
+COPY --chown=appuser:appuser alembic.ini ./
+COPY --chown=appuser:appuser alembic ./alembic
 
 ENV PATH="/app/.venv/bin:$PATH"
 ENV VIRTUAL_ENV="/app/.venv"
@@ -24,4 +27,6 @@ USER appuser
 
 EXPOSE 8000
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload", "--log-level", "debug"]
+# Сначала применяются миграции (идемпотентно), затем запускается API:
+# при первом старте на «новой» машине схема БД не должна требовать ручных шагов.
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --log-level debug"]
