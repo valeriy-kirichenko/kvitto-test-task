@@ -3,7 +3,8 @@
 # Тесты используют отдельную БД `kvitto_test_db` (см. tests/), поэтому в CI:
 #  1) поднимаем PostgreSQL 16 service,
 #  2) создаём тестовую БД (то же, что docker/postgres/init-db.sh локально),
-#  3) применяем миграции alembic,
+#  3) применяем миграции alembic к основной и тестовой БД
+#     (при старте приложение seed'ит основную БД — так же делают тестовые фикстуры),
 #  4) запускаем ruff и pytest.
 name: CI
 
@@ -51,7 +52,10 @@ jobs:
           PGPASSWORD: postgres
         run: psql -v ON_ERROR_STOP=1 -h localhost -U postgres -d postgres -c "CREATE DATABASE kvitto_test_db"
 
-      - name: Apply migrations to test database
+      - name: Apply migrations to main database (kvitto_db)
+        run: uv run alembic upgrade head
+
+      - name: Apply migrations to test database (kvitto_test_db)
         run: ALEMBIC_DATABASE_URL="$TEST_DATABASE_URL" uv run alembic upgrade head
 
       - name: pytest
