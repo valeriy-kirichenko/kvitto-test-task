@@ -1,0 +1,12 @@
+# Локальные артефакты и файлы, не нужные для сборки образа API.
+.venv/
+.git/
+.gitignore
+.pytest_cache/
+.ruff_cache/
+.idea/
+__pycache__/
+*.pyc
+tests/
+.env
+.env.*
