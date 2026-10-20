@@ -19,8 +19,6 @@ class Settings(BaseSettings):
     APP_VERSION: str = Field(default="1.0.0", description="Версия API")
     DEBUG: bool = Field(default=False, description="Режим отладки приложения")
 
-    API_PREFIX: str = Field(default="/api/v1", description="Префикс API")
-
     DOCS_URL: str = Field(default="/docs", description="URL Swagger")
     REDOC_URL: str = Field(default="/redoc", description="URL Redoc")
     OPENAPI_URL: str = Field(

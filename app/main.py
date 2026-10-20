@@ -41,7 +41,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-app.include_router(health.router, prefix=settings.API_PREFIX)
+app.include_router(health.router)
 app.include_router(tariffs.router)
 
 
