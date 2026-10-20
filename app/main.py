@@ -5,7 +5,8 @@ from sqlalchemy.engine import make_url
 
 from app.api import health
 from app.core.config import settings
-from app.core.db import check_connection
+from app.core.db import SessionLocal, check_connection
+from app.core.seed import seed_tariffs
 
 
 @asynccontextmanager
@@ -18,6 +19,11 @@ async def lifespan(app: FastAPI):
     # завершается ошибкой, а не «тихо» без соединения.
     await check_connection()
     print(f"База данных доступна: {make_url(settings.DATABASE_URL)}")
+
+    # Идемпотентное добавление тарифов при старте.
+    async with SessionLocal() as session:
+        await seed_tariffs(session)
+    print("Тарифы готовы")
 
     yield
 
